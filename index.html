@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pica Breathing Star</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+            max-width: 440px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid #334155;
+        }
+        .room-indicator {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            padding: 12px;
+            border-radius: 8px;
+        }
+        .room-soul { background-color: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.4); }
+        .room-mind { background-color: rgba(14, 165, 233, 0.2); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.4); }
+        .room-heart { background-color: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+        .room-strength { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+
+        .room-toggles {
+            display: flex;
+            justify-content: space-between;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+        .toggle-btn {
+            flex: 1;
+            padding: 8px 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border-radius: 6px;
+            border: 1px solid #475569;
+            background: #334155;
+            color: #94a3b8;
+            cursor: pointer;
+        }
+        .toggle-btn.active {
+            background: #2563eb;
+            color: white;
+            border-color: #3b82f6;
+        }
+        .star-container {
+            height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        #starSvg {
+            transition: transform 4s linear;
+            transform-origin: center center;
+        }
+        .breathing-state {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            min-height: 28px;
+            letter-spacing: 1px;
+        }
+        .timer { font-size: 2.2rem; font-weight: bold; margin-bottom: 20px; color: #f1f5f9; }
+        .controls button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 24px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .tracker-box {
+            margin-top: 24px;
+            border-top: 1px solid #334155;
+            padding-top: 20px;
+            text-align: left;
+        }
+        .tracker-title { font-weight: bold; margin-bottom: 16px; color: #cbd5e1; }
+        .slider-group { margin-bottom: 18px; }
+        .slider-group label { display: block; font-size: 0.95rem; margin-bottom: 8px; color: #94a3b8; }
+        .slider-group input { width: 100%; cursor: pointer; }
+        .slider-val { float: right; font-weight: bold; color: #f1f5f9; }
+    </style>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#121D33">
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <link rel="manifest" href="/site.webmanifest">
+</head>
+<body>
+
+<div style="font-size: 0.75rem; color: #cbd5e1; text-align: center; margin-bottom: 12px;">
+  App by Anna Elize de Heer
+</div>
+
+<div class="container">
+    <div id="roomBadge" class="room-indicator room-soul">Room 1: Soul (Yellow)</div>
+    
+    <div class="room-toggles">
+        <button id="btnSoul" class="toggle-btn active" onclick="selectRoom(1)">Soul</button>
+        <button id="btnMind" class="toggle-btn" onclick="selectRoom(2)">Mind</button>
+        <button id="btnHeart" class="toggle-btn" onclick="selectRoom(3)">Heart</button>
+        <button id="btnStrength" class="toggle-btn" onclick="selectRoom(4)">Strength</button>
+    </div>
+    
+    <div class="star-container">
+        <svg id="starSvg" width="200" height="200" viewBox="0 0 100 100" style="color: #fde047;">
+            <polygon points="50.0,5.0 84.6,65.0 15.4,65.0" fill="none" stroke="currentColor" stroke-width="0.8" stroke-linejoin="round"/>
+            <polygon points="75.7,14.4 63.7,82.6 10.6,38.1" fill="none" stroke="currentColor" stroke-width="0.8" stroke-linejoin="round"/>
+            <polygon points="89.4,38.1 36.3,82.6 24.3,14.4" fill="none" stroke="currentColor" stroke-width="0.8" stroke-linejoin="round"/>
+            
+            <circle cx="50" cy="45" r="15" fill="none" stroke="currentColor" stroke-width="0.4" opacity="0.4"/>
+            <circle cx="50" cy="45" r="6" fill="none" stroke="currentColor" stroke-width="0.4" opacity="0.6"/>
+            <circle cx="50" cy="45" r="1.5" fill="currentColor"/>
+        </svg>
+    </div>
+
+    <div id="breathState" class="breathing-state">READY</div>
+    <div id="timerDisplay" class="timer">28:00</div>
+    
+    <div class="controls">
+        <button id="startBtn" onclick="toggleMeditation()">Start Session</button>
+    </div>
+
+    <div class="tracker-box">
+        <div class="tracker-title">📊 PICA Goal Tracker</div>
+        
+        <div class="slider-group">
+            <label>Meditation Minutes Completed <span id="minVal" class="slider-val">0 min</span></label>
+            <input type="range" min="0" max="28" value="0" id="slideMin" oninput="updateSliderText('minVal', this.value + ' min')">
+        </div>
+        
+        <div class="slider-group">
+            <label>Percentage of Daily Goals Reached <span id="goalVal" class="slider-val">0%</span></label>
+            <input type="range" min="0" max="100" value="0" id="slideGoal" oninput="updateSliderText('goalVal', this.value + '%')">
+        </div>
+    </div>
+</div>
+
+<footer style="margin-top: 20px; text-align: center; color: #94a3b8; font-size: 0.8rem;">
+  © 2026 Anna Elize de Heer. All rights reserved.<br>
+  Pica Breathing Star
+</footer>
+
+<script>
+    let totalSeconds = 28 * 60;
+    let isRunning = false;
+    let timerInterval, boxInterval;
+    let currentBoxStep = 0; 
+    let manualOverride = false;
+
+    const badge = document.getElementById('roomBadge');
+    const star = document.getElementById('starSvg');
+    const stateText = document.getElementById('breathState');
+    const timerText = document.getElementById('timerDisplay');
+
+    function updateSliderText(id, val) {
+        document.getElementById(id).innerText = val;
+    }
+
+    function selectRoom(roomNum) {
+        manualOverride = true;
+        updateRoomUI(roomNum);
+    }
+
+    function updateRoomUI(roomNum) {
+        document.getElementById('btnSoul').classList.remove('active');
+        document.getElementById('btnMind').classList.remove('active');
+        document.getElementById('btnHeart').classList.remove('active');
+        document.getElementById('btnStrength').classList.remove('active');
+
+        if (roomNum === 1) {
+            badge.innerText = "Room 1: Soul (Yellow)";
+            badge.className = "room-indicator room-soul";
+            star.style.color = "#fde047";
+            document.getElementById('btnSoul').classList.add('active');
+        } else if (roomNum === 2) {
+            badge.innerText = "Room 2: Mind / Blue Skies";
+            badge.className = "room-indicator room-mind";
+            star.style.color = "#38bdf8";
+            document.getElementById('btnMind').classList.add('active');
+        } else if (roomNum === 3) {
+            badge.innerText = "Room 3: Heart (Green)";
+            badge.className = "room-indicator room-heart";
+            star.style.color = "#4ade80";
+            document.getElementById('btnHeart').classList.add('active');
+        } else if (roomNum === 4) {
+            badge.innerText = "Room 4: Strength (Red)";
+            badge.className = "room-indicator room-strength";
+            star.style.color = "#f87171";
+            document.getElementById('btnStrength').classList.add('active');
+        }
+    }
+
+    function toggleMeditation() {
+        if (isRunning) {
+            clearInterval(timerInterval);
+            clearInterval(boxInterval);
+            document.getElementById('startBtn').innerText = "Start Session";
+            stateText.innerText = "PAUSED";
+            star.style.transform = "scale(1)";
+            isRunning = false;
+        } else {
+            isRunning = true;
+            document.getElementById('startBtn').innerText = "Pause Session";
+            runTimer();
+            runBoxBreathing();
+        }
+    }
+
+    function runTimer() {
+        timerInterval = setInterval(() => {
+            if (totalSeconds <= 0) {
+                clearInterval(timerInterval);
+                clearInterval(boxInterval);
+                stateText.innerText = "SESSION COMPLETE";
+                return;
+            }
+            totalSeconds--;
+            let mins = Math.floor(totalSeconds / 60);
+            let secs = totalSeconds % 60;
+            timerText.innerText = mins + ":" + (secs < 10 ? "0" : "") + secs;
+
+            if (!manualOverride) {
+                if (totalSeconds > 21 * 60) updateRoomUI(1);
+                else if (totalSeconds > 14 * 60) updateRoomUI(2);
+                else if (totalSeconds > 7 * 60) updateRoomUI(3);
+                else updateRoomUI(4);
+            }
+        }, 1000);
+    }
+
+    function runBoxBreathing() {
+        handleBoxStep();
+        boxInterval = setInterval(() => {
+            currentBoxStep = (currentBoxStep + 1) % 4;
+            handleBoxStep();
+        }, 4000);
+    }
+
+    function handleBoxStep() {
+        if (currentBoxStep === 0) {
+            stateText.innerText = "INHALE (4s)";
+            star.style.transform = "scale(1.3)";
+        } else if (currentBoxStep === 1) {
+            stateText.innerText = "HOLD (FULL) (4s)";
+            star.style.transform = "scale(1.3)";
+        } else if (currentBoxStep === 2) {
+            stateText.innerText = "EXHALE (4s)";
+            star.style.transform = "scale(0.85)";
+        } else if (currentBoxStep === 3) {
+            stateText.innerText = "HOLD (EMPTY) (4s)";
+            star.style.transform = "scale(0.85)";
+        }
+    }
+</script>
+</body>
+</html>
