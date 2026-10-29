@@ -277,14 +277,7 @@
             star.style.transform = "scale(0.85)";
         }
     }
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(() => console.log('Service worker registered'))
-        .catch((err) => console.log('Service worker failed:', err));
-    });
-  }
+
 </script>
 </body>
 </html>
