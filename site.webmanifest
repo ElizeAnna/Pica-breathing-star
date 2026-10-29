@@ -1,0 +1,17 @@
+  
+JSON
+{
+  "name": "Pica Breathing Star",
+  "short_name": "Pica",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121D33",
+  "theme_color": "#121D33",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
